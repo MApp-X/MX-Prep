@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "996571971547",
+    "project_id": "mx-prep",
+    "storage_bucket": "mx-prep.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996571971547:android:443a79285fdb1d4d57b1fe",
+        "android_client_info": {
+          "package_name": "com.mappx.mxprep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996571971547-gn9m9ca27hl88ff8to7m1ffl9tbn6650.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mappx.mxprep",
+            "certificate_hash": "e1b8311e9553bf6720b93d87891ef7a2e2da7a61"
+          }
+        },
+        {
+          "client_id": "996571971547-j7717eqo6o8rclior094u790299plo6j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqFl997L4RU6Zvh5cn9TAERkiHmThN6Jo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996571971547-j7717eqo6o8rclior094u790299plo6j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
