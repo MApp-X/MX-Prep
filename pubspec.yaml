@@ -19,11 +19,13 @@ dependencies:
   permission_handler: 11.3.1
   flutter_local_notifications: ^22.3.3
   timezone: ^0.11.2
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -41,3 +43,11 @@ flutter:
     - assets/ceo.jpeg
     - assets/logo-motionmindx.png
     - assets/images/books/hsc/
+
+
+# icon launcher
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/logo.png"
+  min_sdk_android: 21
