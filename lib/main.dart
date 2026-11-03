@@ -12,22 +12,13 @@ import 'screens/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  await NotificationService.initialize();
-
+  // Fast pre-load only authentication flags to determine initial screen
   final prefs = await SharedPreferences.getInstance();
   final isAuthed = prefs.getBool('is_authed') ?? false;
   final isConfigured = prefs.getBool('is_configured') ?? false;
 
   final userClass = prefs.getString('user_class') ?? 'HSC';
   final userGroup = prefs.getString('user_group') ?? 'Science';
-
-  if (isAuthed && isConfigured) {
-    await StudyRepository.initialize(userClass: userClass, userGroup: userGroup);
-  }
 
   Widget startPage = const LoginScreen();
   if (isAuthed && !isConfigured) {
@@ -36,12 +27,31 @@ void main() async {
     startPage = const HomeScreen();
   }
 
-  runApp(MXPrepApp(startScreen: startPage));
+  // Launch UI instantly so splash screen is removed immediately
+  runApp(MXPrepApp(
+    startScreen: startPage,
+    isAuthed: isAuthed,
+    isConfigured: isConfigured,
+    userClass: userClass,
+    userGroup: userGroup,
+  ));
 }
 
 class MXPrepApp extends StatefulWidget {
   final Widget startScreen;
-  const MXPrepApp({super.key, required this.startScreen});
+  final bool isAuthed;
+  final bool isConfigured;
+  final String userClass;
+  final String userGroup;
+
+  const MXPrepApp({
+    super.key,
+    required this.startScreen,
+    required this.isAuthed,
+    required this.isConfigured,
+    required this.userClass,
+    required this.userGroup,
+  });
 
   @override
   State<MXPrepApp> createState() => _MXPrepAppState();
@@ -51,9 +61,32 @@ class _MXPrepAppState extends State<MXPrepApp> {
   @override
   void initState() {
     super.initState();
+    // Run background services after the initial frame renders
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeBackgroundServices();
       _requestNotificationPermission();
     });
+  }
+
+  Future<void> _initializeBackgroundServices() async {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (_) {}
+
+    try {
+      await NotificationService.initialize();
+    } catch (_) {}
+
+    if (widget.isAuthed && widget.isConfigured) {
+      try {
+        await StudyRepository.initialize(
+          userClass: widget.userClass,
+          userGroup: widget.userGroup,
+        );
+      } catch (_) {}
+    }
   }
 
   Future<void> _requestNotificationPermission() async {

@@ -12,7 +12,7 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   // Fresh channel ID to bypass any cached muted settings in Android OS
-  static const String _channelId = 'mx_prep_live_alerts_v1';
+  static const String _channelId = 'mx_prep_alerts_release_v1';
   static const String _channelName = 'Study Alerts & Reminders';
   static const String _channelDescription =
       'Daily study goals, streaks, and test reminders';
@@ -40,7 +40,7 @@ class NotificationService {
     }
 
     const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/launcher_icon');
 
     const InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
@@ -122,7 +122,7 @@ class NotificationService {
       hour: 8,
       minute: 0,
       title: 'শুভ সকাল! ☀️',
-      body: 'আজকের পড়ার টার্গেট $totalGoal পেইজ। চলো শুরু করে দিনটা এগিয়ে রাখি!',
+      body: 'আজকের পড়ার টার্গেট $totalGoal পেইজ। চলো শুরু করে দিনটা এগিয়ে রাখি!',
       type: 'routine_morning',
     );
 
@@ -131,8 +131,8 @@ class NotificationService {
       alarmId: 102,
       hour: 13,
       minute: 30,
-      title: 'দিনের অর্ধেক সময় পার হলো! ⏳',
-      body: 'আজকের টার্গেটের কতটুকু পড়া হলো? ব্রেক নিয়ে একটু রিভিশন দিয়ে নাও।',
+      title: 'দিনের অর্ধেক সময় পার হলো! ⏳',
+      body: 'আজকের টার্গেটের কতটুকু পড়া হলো? ব্রেক নিয়ে একটু রিভিশন দিয়ে নাও।',
       type: 'routine_noon',
     );
 
@@ -142,7 +142,7 @@ class NotificationService {
       hour: 22,
       minute: 30,
       title: 'দিনের শেষ অডিট! 🌙',
-      body: 'আজকের সব পেইজ পড়া শেষ হয়েছে তো? স্ট্রিক ধরে রাখতে বাকিটুকু শেষ করে ঘুমাও!',
+      body: 'আজকের সব পেইজ পড়া শেষ হয়েছে তো? স্ট্রিক ধরে রাখতে বাকিটুকু শেষ করে ঘুমাও!',
       type: 'routine_night',
     );
   }
@@ -169,12 +169,12 @@ class NotificationService {
       _channelName,
       channelDescription: _channelDescription,
       importance: Importance.max,
-      priority: Priority.high,
+      priority: Priority.max,
       playSound: true,
       enableVibration: true,
       visibility: NotificationVisibility.public,
       fullScreenIntent: true,
-      icon: '@mipmap/ic_launcher',
+      icon: '@mipmap/launcher_icon',
     );
 
     await _notificationsPlugin.zonedSchedule(
@@ -216,7 +216,7 @@ class NotificationService {
         _channelName,
         channelDescription: _channelDescription,
         importance: Importance.max,
-        priority: Priority.high,
+        priority: Priority.max,
         playSound: true,
         enableVibration: true,
         showWhen: true,
@@ -224,7 +224,7 @@ class NotificationService {
         visibility: NotificationVisibility.public,
         vibrationPattern: Int64List.fromList([0, 500, 250, 500]),
         audioAttributesUsage: AudioAttributesUsage.notification,
-        icon: '@mipmap/ic_launcher',
+        icon: '@mipmap/launcher_icon',
       );
 
       await _notificationsPlugin.zonedSchedule(
@@ -285,7 +285,7 @@ class NotificationService {
         alarmId: warningAlarmId,
         notifId: warningNotifId,
         title: 'দারুণ গতিতে এগোচ্ছ! 📖',
-        body: 'আজকের লক্ষ্য পূরণ করতে আর মাত্র $leftPages পৃষ্ঠা বাকি। আর কিছুক্ষণ পড়লেই ডান!',
+        body: 'আজকের লক্ষ্য পূরণ করতে আর মাত্র $leftPages পৃষ্ঠা বাকি। আর কিছুক্ষণ পড়লেই ডান!',
         scheduledDate: triggerTime,
         type: 'goal_warning',
       );
@@ -312,13 +312,14 @@ class NotificationService {
       _channelName,
       channelDescription: _channelDescription,
       importance: Importance.max,
-      priority: Priority.high,
+      priority: Priority.max,
       playSound: true,
       enableVibration: true,
       showWhen: true,
+      visibility: NotificationVisibility.public,
       vibrationPattern: Int64List.fromList([0, 500, 250, 500]),
       audioAttributesUsage: AudioAttributesUsage.notification,
-      icon: '@mipmap/ic_launcher',
+      icon: '@mipmap/launcher_icon',
     );
 
     await _notificationsPlugin.show(
