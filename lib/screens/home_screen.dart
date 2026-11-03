@@ -1,114 +1,120 @@
 import 'package:flutter/material.dart';
-import '../data/books_data.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/app_top_bar.dart';
+import '../widgets/app_bottom_nav.dart';
+import '../services/notification_service.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'profile_screen.dart';
+import 'notifications_screen.dart';
+
+import 'tabs/home_tab.dart';
+import 'tabs/books_tab.dart';
+import 'tabs/exam_tab.dart';
+import 'tabs/plan_tab.dart';
+import 'tabs/settings_tab.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+  String _userName = 'Student';
+  String? _userPhoto;
+  int _refreshTrigger = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+    NotificationService.autoAuditOnAppOpen();
+    NotificationService.syncPendingNotifications();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _userName = prefs.getString('user_name') ?? 'Student';
+        _userPhoto = prefs.getString('user_photo');
+      });
+    }
+  }
+
+  // Generate tab dynamically to ensure fresh data fetch on every switch
+  Widget _buildCurrentTab() {
+    switch (_currentIndex) {
+      case 1:
+        return BooksTab(key: ValueKey('books_$_refreshTrigger'));
+      case 2:
+        return ExamTab(key: ValueKey('exam_$_refreshTrigger'));
+      case 3:
+        return PlanTab(key: ValueKey('plan_$_refreshTrigger'));
+      case 4:
+        return SettingsTab(key: ValueKey('settings_$_refreshTrigger'));
+      default:
+        return HomeTab(key: ValueKey('home_$_refreshTrigger'));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Color(0xFFEFF6FF),
-              child: Icon(Icons.person, color: Color(0xFF2563EB)),
-            ),
-            SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Siam', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
-                Text('HSC • Science', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-              ],
-            )
-          ],
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+        }
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.white,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Daily Target', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
-                SizedBox(height: 6),
-                Text('45 / 100 MCQs Solved', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                SizedBox(height: 12),
-                LinearProgressIndicator(value: 0.45, color: Colors.amber, backgroundColor: Colors.white24),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text('Your Curriculum Books', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-          const SizedBox(height: 14),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: hscBooks.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              childAspectRatio: 0.75,
-            ),
-            itemBuilder: (context, index) {
-              final book = hscBooks[index];
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 4)),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                        child: Image.asset(
-                          book.coverImage,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: const Color(0xFFE2E8F0),
-                            child: const Icon(Icons.book, size: 40, color: Color(0xFF94A3B8)),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(book.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                          const SizedBox(height: 4),
-                          Text('${book.chapters.length} Chapters • ${book.totalMcq} MCQs', style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF8FAFC),
+          appBar: AppTopBar(
+            currentIndex: _currentIndex,
+            userName: _userName,
+            userPhoto: _userPhoto,
+            onProfileTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
               );
+              _loadUserInfo();
+              setState(() => _refreshTrigger++);
+            },
+            onNotificationTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+              await NotificationService.syncPendingNotifications();
+              if (mounted) {
+                setState(() => _refreshTrigger++);
+              }
             },
           ),
-        ],
+          body: _buildCurrentTab(),
+          bottomNavigationBar: AppBottomNav(
+            currentIndex: _currentIndex,
+            onTabSelected: (index) {
+              setState(() {
+                _currentIndex = index;
+                _refreshTrigger++;
+              });
+            },
+          ),
+        ),
       ),
     );
   }
